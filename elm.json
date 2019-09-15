@@ -1,0 +1,18 @@
+{
+    "type": "package",
+    "name": "justinmimbs/tzif-decoder",
+    "summary": "Decode TZif files to Time.Zone values",
+    "license": "BSD-3-Clause",
+    "version": "1.0.0",
+    "exposed-modules": [
+        "TZif"
+    ],
+    "elm-version": "0.19.0 <= v < 0.20.0",
+    "dependencies": {
+        "elm/bytes": "1.0.8 <= v < 2.0.0",
+        "elm/core": "1.0.0 <= v < 2.0.0",
+        "elm/parser": "1.0.0 <= v < 2.0.0",
+        "elm/time": "1.0.0 <= v < 2.0.0"
+    },
+    "test-dependencies": {}
+}
