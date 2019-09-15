@@ -1,6 +1,6 @@
 {
     "type": "package",
-    "name": "justinmimbs/tzif-decoder",
+    "name": "justinmimbs/tzif",
     "summary": "Decode TZif files to Time.Zone values",
     "license": "BSD-3-Clause",
     "version": "1.0.0",
