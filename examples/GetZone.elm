@@ -23,54 +23,26 @@ main =
 type Model
     = Loading
     | Failure String
-    | Success ( String, Time.Zone )
+    | Success String Time.Zone
 
 
 type Msg
-    = ReceivedZone (Result String ( String, Time.Zone ))
+    = ReceivedZoneName Time.ZoneName
+    | ReceivedZone String (Result Http.Error Time.Zone)
 
 
 init : ( Model, Cmd Msg )
 init =
     ( Loading
-    , getZone "/dist/2019c"
-        |> Task.attempt ReceivedZone
+    , Time.getZoneName |> Task.perform ReceivedZoneName
     )
 
 
-getZone : String -> Task String ( String, Time.Zone )
-getZone basePath =
-    Time.getZoneName
-        |> Task.andThen
-            (\nameOrOffset ->
-                case nameOrOffset of
-                    Time.Name zoneName ->
-                        getZoneByName basePath zoneName
-                            |> Task.map (Tuple.pair zoneName)
-
-                    Time.Offset _ ->
-                        Task.fail "No zone name"
-            )
-
-
-getZoneByName : String -> String -> Task String Time.Zone
-getZoneByName basePath zoneName =
-    Http.task
-        { method = "GET"
-        , headers = []
-        , url = basePath ++ "/" ++ zoneName
-        , body = Http.emptyBody
-        , resolver =
-            Http.bytesResolver
-                (\response ->
-                    case response of
-                        Http.GoodStatus_ _ tzif ->
-                            tzif |> Bytes.Decode.decode TZif.decode |> Result.fromMaybe "Failed to decode TZif"
-
-                        _ ->
-                            Err "HTTP error"
-                )
-        , timeout = Nothing
+getZoneByName : String -> Cmd Msg
+getZoneByName zoneName =
+    Http.get
+        { url = "/dist/2019c/" ++ zoneName
+        , expect = Http.expectBytes (ReceivedZone zoneName) TZif.decode
         }
 
 
@@ -79,15 +51,34 @@ getZoneByName basePath zoneName =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update (ReceivedZone result) _ =
-    ( case result of
-        Ok data ->
-            Success data
+update msg model =
+    case msg of
+        ReceivedZoneName nameOrOffset ->
+            case nameOrOffset of
+                Time.Name zoneName ->
+                    ( Loading
+                    , getZoneByName zoneName
+                    )
 
-        Err message ->
-            Failure message
-    , Cmd.none
-    )
+                Time.Offset _ ->
+                    ( Failure "Could not get local zone name"
+                    , Cmd.none
+                    )
+
+        ReceivedZone zoneName result ->
+            ( case result of
+                Ok zone ->
+                    Success zoneName zone
+
+                Err error ->
+                    case error of
+                        Http.BadBody message ->
+                            Failure message
+
+                        _ ->
+                            Failure "HTTP request failed"
+            , Cmd.none
+            )
 
 
 
@@ -105,21 +96,21 @@ view model =
             Failure message ->
                 [ Html.pre [ Html.Attributes.style "color" "red" ] [ Html.text message ] ]
 
-            Success ( zoneName, zone ) ->
+            Success zoneName zone ->
                 [ Html.pre
                     []
                     [ [ "Examples of Posix times displayed in UTC and your local time:"
                       , ""
-                      , "UTC                      | " ++ zoneName
-                      , "------------------------ | ------------------------"
+                      , "UTC              | " ++ zoneName
+                      , "---------------- | ----------------"
                       ]
-                        ++ ([ 867564229068
-                            , 1131357044194
-                            , 1467083800795
-                            , 1501214531979
-                            , 1512980764516
+                        ++ ([ 1689782246881
                             , 1561825998564
-                            , 1689782246881
+                            , 1512980764516
+                            , 1501214531979
+                            , 1467083800795
+                            , 1131357044194
+                            , 867564229068
                             ]
                                 |> List.map Time.millisToPosix
                                 |> List.map
@@ -137,78 +128,53 @@ view model =
 formatPosix : Time.Zone -> Posix -> String
 formatPosix zone posix =
     String.join " "
-        [ Time.toWeekday zone posix |> weekdayToName
-        , Time.toMonth zone posix |> monthToName
-        , Time.toDay zone posix |> String.fromInt |> String.padLeft 2 '0'
-        , Time.toYear zone posix |> String.fromInt
+        [ String.join "-"
+            [ Time.toYear zone posix |> String.fromInt
+            , Time.toMonth zone posix |> monthToNumber |> String.fromInt |> String.padLeft 2 '0'
+            , Time.toDay zone posix |> String.fromInt |> String.padLeft 2 '0'
+            ]
         , String.join ":"
             [ Time.toHour zone posix |> String.fromInt |> String.padLeft 2 '0'
             , Time.toMinute zone posix |> String.fromInt |> String.padLeft 2 '0'
-            , Time.toSecond zone posix |> String.fromInt |> String.padLeft 2 '0'
             ]
         ]
 
 
-monthToName : Month -> String
-monthToName m =
+monthToNumber : Month -> Int
+monthToNumber m =
     case m of
         Jan ->
-            "Jan"
+            1
 
         Feb ->
-            "Feb"
+            2
 
         Mar ->
-            "Mar"
+            3
 
         Apr ->
-            "Apr"
+            4
 
         May ->
-            "May"
+            5
 
         Jun ->
-            "Jun"
+            6
 
         Jul ->
-            "Jul"
+            7
 
         Aug ->
-            "Aug"
+            8
 
         Sep ->
-            "Sep"
+            9
 
         Oct ->
-            "Oct"
+            10
 
         Nov ->
-            "Nov"
+            11
 
         Dec ->
-            "Dec"
-
-
-weekdayToName : Weekday -> String
-weekdayToName wd =
-    case wd of
-        Mon ->
-            "Mon"
-
-        Tue ->
-            "Tue"
-
-        Wed ->
-            "Wed"
-
-        Thu ->
-            "Thu"
-
-        Fri ->
-            "Fri"
-
-        Sat ->
-            "Sat"
-
-        Sun ->
-            "Sun"
+            12
