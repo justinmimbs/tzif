@@ -29,8 +29,18 @@ end=$(date --date="2038-01-01" --utc +%s)
 
 git -C tz -c advice.detachedHead=false checkout $version
 echo "Compiling tz data..."
-make -C tz install_data DESTDIR="$output" TZDIR="" REDO=posix_only ZFLAGS="-b slim -r @$start/@$end"
+make -C tz --quiet install_data DESTDIR="$output" TZDIR="" REDO=posix_only ZFLAGS="-b slim -r @$start/@$end"
 git -C tz checkout master
+
+# make zones list
+
+zones="$output/zones.text"
+cat tz/zone1970.tab | grep -v "^#" | cut -f3 | sort > "$zones"
+
+# remove TZif files not on the zones list
+
+find dist/2019c -type f -not -name *.text | grep -F -v -f "$zones" | xargs rm
+find dist/2019c -type d -empty -delete
 
 # make elm file
 
