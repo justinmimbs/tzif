@@ -1,4 +1,7 @@
-module Examples exposing (main)
+module Zones exposing (main)
+
+{-| This page attempts to fetch and decode a set of TZif files.
+-}
 
 import Browser
 import Bytes.Decode

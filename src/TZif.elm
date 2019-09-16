@@ -1,10 +1,27 @@
 module TZif exposing (decode)
 
+{-|
+
+@docs decode
+
+-}
+
 import Bytes exposing (Bytes)
 import Bytes.Decode as Decode exposing (Decoder)
 import Time
 
 
+{-| Decode a TZif file into a `Time.Zone` value.
+
+    import Bytes.Decode
+    import TZif
+    import Time
+
+    zone : Maybe Time.Zone
+    zone =
+        Bytes.Decode.decode TZif.decode tzif
+
+-}
 decode : Decoder Time.Zone
 decode =
     decodeHeader

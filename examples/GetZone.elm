@@ -6,8 +6,8 @@ import Html exposing (Html)
 import Html.Attributes
 import Http
 import TZif
-import Task exposing (Task)
-import Time exposing (Month(..), Posix, Weekday(..))
+import Task
+import Time exposing (Month(..), Posix)
 
 
 main : Program () Model Msg

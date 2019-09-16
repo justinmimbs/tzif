@@ -41,7 +41,3 @@ cat tz/zone1970.tab | grep -v "^#" | cut -f3 | sort > "$zones"
 
 find "$output" -type f -not -name *.text | grep -F -v -f "$zones" | xargs rm
 find "$output" -type d -empty -delete
-
-# make elm file
-
-elm make GetZone.elm --output="getzone.html"
