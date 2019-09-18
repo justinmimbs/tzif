@@ -18,7 +18,7 @@ decode : Bytes.Decode.Decoder Time.Zone
 
 ## Why would I need this?
 
-If you need `Time.Zone` values for using with `elm/time`, then one approach is to fetch the required zones at runtime. See [examples/GetZone.elm][getzone] for an example that fetches the local time zone.
+If you need `Time.Zone` values for using with `elm/time`, then one approach is to fetch the required zones at run-time. See [examples/GetZone.elm][getzone] for an example that fetches the local time zone.
 
 ## Where do I get TZif files?
 
@@ -29,11 +29,11 @@ See [examples/build.sh][build] for an example that does the following:
 - clones the IANA Time Zone Database [repository][tz]
 - compiles TZif files for the latest release
 
-The script installs TZif files to `./dist/<version>/`, where `<version>` is the latest release (e.g. `2019c`).
+The script installs TZif files to `dist/<version>/`, where `<version>` is the latest release (e.g. `2019c`).
 
 The script builds TZif files that contain all transitions between 1970 and 2037. However, if your application only uses timestamps after, say, 2010, then you can build smaller TZif files by [limiting the range][buildrange] accordingly.
 
-**Note:** a Unix-like computer usually has a set of TZif files installed at `/usr/share/zoneinfo/`; however, I would not recommend distributing those to clients of your web application because they are likely to be bloated by backward-compatibility and contain a vast range of transition times. If you build your own, then you can build smaller files for just the time range you need.
+**Note:** A Unix-like computer usually has a set of TZif files installed at `/usr/share/zoneinfo/`; however, I would not recommend distributing those to clients of your web application because they are likely to be bloated for backward-compatibility and contain a vast range of transition times. If you build your own as described above, then you can build smaller files for just the time range you need.
 
 [elmtime]: https://package.elm-lang.org/packages/elm/time/latest/
 [tzif]: https://tools.ietf.org/html/rfc8536
