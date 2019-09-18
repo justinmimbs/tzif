@@ -16,8 +16,8 @@ fi
 
 version=$(git -C "$tz" describe --tags --abbrev=0)
 output="$(pwd -P)/zoneinfo"
-start=$(date --date="1900-01-01" --utc +%s)
-end=$(date --date="2050-01-01" --utc +%s)
+start=-2208988800 # 1900-01-01
+end=2524608000 # 2050-01-01
 
 git -C "$tz" -c advice.detachedHead=false checkout $version
 echo "Compiling tz data..."

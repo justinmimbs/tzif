@@ -24,8 +24,16 @@ fi
 
 # make tz data
 
-start=$(date --date="1970-01-01" --utc +%s)
-end=$(date --date="2038-01-01" --utc +%s)
+start=0
+end=2145916800
+
+# GNU `date`
+# start=$(date --date="1970-01-01" --utc +%s)
+# end=$(date --date="2038-01-01" --utc +%s)
+
+# Unix `date`
+# start=$(date -ju -f "%Y-%m-%d %H:%M:%S" "1970-01-01 00:00:00" +%s)
+# end=$(date -ju -f "%Y-%m-%d %H:%M:%S" "2038-01-01 00:00:00" +%s)
 
 git -C tz -c advice.detachedHead=false checkout $version
 echo "Compiling tz data..."
