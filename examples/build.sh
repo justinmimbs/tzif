@@ -24,8 +24,8 @@ fi
 
 # make tz data
 
-start=0
-end=2145916800
+start=0 # 1970-01-01
+end=2145916800 # 2038-01-01
 
 # GNU `date`
 # start=$(date --date="1970-01-01" --utc +%s)
