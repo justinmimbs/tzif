@@ -1,4 +1,4 @@
-module Examples exposing (main)
+module GetZone exposing (main)
 
 import Browser
 import Bytes.Decode
@@ -41,7 +41,7 @@ init =
 getZoneByName : String -> Cmd Msg
 getZoneByName zoneName =
     Http.get
-        { url = "/dist/2019c/" ++ zoneName
+        { url = "/dist/2021b/" ++ zoneName
         , expect = Http.expectBytes (ReceivedZone zoneName) TZif.decode
         }
 

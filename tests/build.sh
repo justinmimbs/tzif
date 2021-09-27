@@ -9,7 +9,7 @@ tz="../examples/tz"
 if [ ! -d "$tz/.git" ]; then
     git clone https://github.com/eggert/tz.git "$tz"
 else
-    git -C "$tz" checkout master && git -C "$tz" pull
+    git -C "$tz" checkout main && git -C "$tz" pull
 fi
 
 # make tz data
@@ -22,7 +22,7 @@ end=2524608000 # 2050-01-01
 git -C "$tz" -c advice.detachedHead=false checkout $version
 echo "Compiling tz data..."
 make -C "$tz" --quiet install_data DESTDIR="$output" TZDIR="" REDO=posix_only ZFLAGS="-b fat -r @$start/@$end"
-git -C "$tz" checkout master
+git -C "$tz" checkout main
 
 # make zones list
 
